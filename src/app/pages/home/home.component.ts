@@ -11,22 +11,61 @@ import Swall from 'sweetalert2'
 export class HomeComponent implements OnInit {
 
   videos: Video[] = [];
+  hayAtras: boolean = false;
+
+  private contador = 0;
 
   constructor( private tubeService: TubeService ) { }
 
   ngOnInit(): void {
 
-    this.cargarVideos();
+    this.tubeService.getVideos( 'adelante' ).subscribe( res => {
 
-  }
-
-  cargarVideos() {
-
-    this.tubeService.getVideos().subscribe( res => {
+      // console.log(res);
 
       this.videos.push( ...res );
 
-      console.log( this.videos );
+
+    })
+
+  }
+
+  cargarVideos( opcion: string ) {
+
+    // console.log( opcion );
+
+    this.tubeService.getVideos( opcion ).subscribe( res => {
+
+      // console.log(res);
+
+      this.videos = [];
+
+      this.videos.push( ...res );
+
+      if(opcion === 'adelante'){
+        this.contador = this.contador + 1;
+      }
+
+      if(opcion === 'atras'){
+        this.contador = this.contador - 1;
+      }
+
+      if( this.contador <= 0 ) {
+
+        this.hayAtras = false;
+
+      } else {
+
+        this.hayAtras = true;
+
+      }
+
+
+      // this.hayAtras = true;
+
+      // console.log( this.contador );
+      // console.log( this.hayAtras );
+      
 
     })
 

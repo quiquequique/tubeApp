@@ -10,20 +10,25 @@ export class TubeService {
 
   private url = 'https://www.googleapis.com/youtube/v3/';
   private apikey = 'AIzaSyCqIk7PTsHzXiCRcYrd268NUgphRE54x4I';
-  private playlist = 'UUuaPTYj15JSkETGnEseaFFg';
+  private playlist = 'UUfknJn7W2MRC25I0b5nHdDw';
   private nextPageToken = '';
+  private prevPageToken = '';
 
   constructor( private http: HttpClient ) {}
 
   // https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&key=AIzaSyCqIk7PTsHzXiCRcYrd268NUgphRE54x4I&playlistId=UUuaPTYj15JSkETGnEseaFFg&maxResults=10
 
-  getVideos() {
+  getVideos( opcion: string ) {
+
+    console.log(opcion);
 
     const url = `${ this.url }playlistItems`;
 
-    const params = new HttpParams()
+    if(opcion === 'adelante') {
+
+      const params = new HttpParams()
       .set('part', 'snippet')
-      .set('maxResults', '12')
+      .set('maxResults', '8')
       .set('playlistId', this.playlist)
       .set('key', this.apikey)
       .set('pageToken', this.nextPageToken)
@@ -33,7 +38,12 @@ export class TubeService {
 
         map( res => {
 
+          // console.log( res );
+
           this.nextPageToken = res.nextPageToken;
+          if( res.prevPageToken ) {
+            this.prevPageToken = res.prevPageToken;
+          };
 
           return res.items;
         }),
@@ -42,6 +52,34 @@ export class TubeService {
           return items.map( video => video.snippet )
         })
       )
+    }else if( opcion === 'atras' && this.prevPageToken ) {
+
+      const params = new HttpParams()
+      .set('part', 'snippet')
+      .set('maxResults', '8')
+      .set('playlistId', this.playlist)
+      .set('key', this.apikey)
+      .set('pageToken', this.prevPageToken)
+
+    return this.http.get<TubeResponse>( url, { params: params })
+      .pipe(
+
+        map( res => {
+
+          // console.log( res );
+
+          this.nextPageToken = res.nextPageToken;
+          if( res.prevPageToken ) {this.prevPageToken = res.prevPageToken};
+
+          return res.items;
+        }),
+        map( items => {
+
+          return items.map( video => video.snippet )
+        })
+      )
+    }
+
 
   }
 }

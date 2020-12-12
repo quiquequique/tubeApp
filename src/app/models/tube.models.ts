@@ -2,6 +2,7 @@ export interface TubeResponse {
     kind:          string;
     etag:          string;
     nextPageToken: string;
+    prevPageToken: string;
     items:         Item[];
     pageInfo:      PageInfo;
 }
